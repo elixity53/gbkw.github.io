@@ -1,6 +1,3 @@
-// Gentle Bear Knifeworks - Main JavaScript
-// Handles all animations, interactions, and effects
-
 class GentleBearKnifeworks {
     constructor() {
         this.isLoaded = false;
