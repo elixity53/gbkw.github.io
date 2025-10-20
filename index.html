@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gentle Bear Knifeworks - Hand-Forged Precision Blades</title>
+    <meta name="description" content="Custom handmade knives by Jamaal Simpson. Traditional blacksmithing meets modern craftsmanship. Hunting knives, chef knives, and custom orders.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    
+    <style>
+        :root {
+            --charcoal-black: #1B1B1B;
+            --burnt-orange: #D96B2B;
+            --gunmetal-gray: #2E2E2E;
+            --warm-white: #F5F3EF;
+            --forge-red: #B85450;
+            --steel-blue: #4A5568;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--charcoal-black);
+            color: var(--warm-white);
+            overflow-x: hidden;
+        }
+        
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-bebas { font-family: 'Bebas Neue', cursive; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--charcoal-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--burnt-orange);
+            border-radius: 4px;
+        }
+        
+        /* Hero background */
+        .hero-bg {
+            background: linear-gradient(135deg, var(--charcoal-black) 0%, var(--gunmetal-gray) 100%);
+            position: relative;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('resources/hero-forge.png') center/cover no-repeat;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Particle canvas */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Gallery styles */
+        .gallery-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            background-color: var(--gunmetal-gray);
+            border-radius: 12px;
+        }
+        
+        .gallery-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(217, 107, 43, 0.2), transparent);
+            transition: left 0.5s;
+            z-index: 2;
+        }
+        
+        .gallery-item:hover::before {
+            left: 100%;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(217, 107, 43, 0.3);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--burnt-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--burnt-orange), var(--forge-red));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in-up.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Lightbox */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+        }
+        
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .lightbox-info {
+            background: rgba(27, 27, 27, 0.9);
+            padding: 1rem;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        /* Clean grid layout */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+        
+        /* Process section styling */
+        .process-step {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(46, 46, 46, 0.5);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(217, 107, 43, 0.2);
+        }
+        
+        .process-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--burnt-orange), var(--forge-red));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Canvas -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="nav-link text-white hover:text-orange-400">About</a>
+                    <a href="contact.html" class="nav-link text-white hover:text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden mobile-menu-btn text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4 pb-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="#home" class="text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="text-white hover:text-orange-400">About</a>
+                    <a href="contact.html" class="text-white hover:text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center justify-center relative">
+        <div class="hero-content container mx-auto px-6 text-center">
+            <h1 class="hero-title font-cinzel text-5xl md:text-7xl font-bold mb-6 opacity-0">
+                <span class="typewriter-text"></span>
+            </h1>
+            <p class="hero-subtitle text-xl md:text-2xl mb-8 opacity-0 text-gray-300">
+                Where Traditional Craftsmanship Meets Modern Excellence
+            </p>
+            <div class="hero-cta opacity-0">
+                <a href="#gallery" class="btn-primary inline-block px-8 py-4 rounded-lg text-white font-semibold text-lg">
+                    View Our Work
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+    
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <!-- Section Header -->
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">Our Collection</h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Each knife is a unique creation, forged with patience and precision for discerning craftsmen.
+                </p>
+            </div>
+            
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Gallery items will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Process Section -->
+    <section id="process" class="py-20 bg-black">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                    The Forging Process
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    From raw steel to finished masterpiece, every step is performed with precision and care.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+                <!-- Process Step 1 -->
+                <div class="process-step fade-in-up">
+                    <div class="process-icon">
+                        <span>🔥</span>
+                    </div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">The Forge Ignites</h3>
+                    <p class="text-gray-400 text-sm">
+                        Steel heated to 2200°F, transforming raw metal into workable material through intense heat and careful temperature control.
+                    </p>
+                </div>
+                
+                <!-- Process Step 2 -->
+                <div class="process-step fade-in-up">
+                    <div class="process-icon">
+                        <span>🔨</span>
+                    </div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Shaping the Steel</h3>
+                    <p class="text-gray-400 text-sm">
+                        Hammer and anvil work in harmony, forging the blade's fundamental form through rhythmic strikes and careful manipulation.
+                    </p>
+                </div>
+                
+                <!-- Process Step 3 -->
+                <div class="process-step fade-in-up">
+                    <div class="process-icon">
+                        <span>⚡</span>
+                    </div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Grinding & Sharpening</h3>
+                    <p class="text-gray-400 text-sm">
+                        Precision grinding creates the edge geometry and final blade profile, ensuring optimal cutting performance and durability.
+                    </p>
+                </div>
+                
+                <!-- Process Step 4 -->
+                <div class="process-step fade-in-up">
+                    <div class="process-icon">
+                        <span>🌳</span>
+                    </div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Handle Crafting</h3>
+                    <p class="text-gray-400 text-sm">
+                        Traditional materials shaped and fitted to create the perfect grip, balancing aesthetics with functional ergonomics.
+                    </p>
+                </div>
+                
+                <!-- Process Step 5 -->
+                <div class="process-step fade-in-up">
+                    <div class="process-icon">
+                        <span>✨</span>
+                    </div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Final Touch</h3>
+                    <p class="text-gray-400 text-sm">
+                        Heat treatment, engraving, and finishing create a lasting masterpiece that's both beautiful and functional.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action Section -->
+    <section id="cta" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-6 text-white">
+                    Ready to Own a Piece of History?
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Every knife tells a story. Let us help you create a blade that will be passed down through generations.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="contact.html" class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg inline-block">
+                        Get In Touch
+                    </a>
+                    <a href="about.html" class="px-8 py-4 rounded-lg border-2 border-orange-600 text-orange-400 font-semibold text-lg hover:bg-orange-600 hover:text-white transition-colors inline-block">
+                        Learn Our Story
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <!-- Logo -->
+                <div class="flex items-center justify-center space-x-2 mb-6">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-2">Jamaal Simpson - Master Bladesmith</p>
+                    <p class="text-gray-400 mb-2">
+                        <a href="mailto:Jamaulsimp@gmail.com" class="hover:text-orange-400 transition-colors">
+                            Jamaulsimp@gmail.com
+                        </a>
+                    </p>
+                    <p class="text-gray-400 mb-4">
+                        <a href="tel:+15059070229" class="hover:text-orange-400 transition-colors">
+                            (505) 907-0229
+                        </a>
+                    </p>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center space-x-6 mb-6">
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-gray-400 hover:text-orange-400 transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Tagline -->
+                <p class="font-cinzel text-lg text-orange-400 mb-2">
+                    "Forged with Patience. Built to Endure."
+                </p>
+                
+                <!-- Copyright -->
+                <p class="text-gray-500 text-sm">
+                    © 2024 Gentle Bear Knifeworks. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Main JavaScript -->
+    <script src="main.js"></script>
+    <script>
+        // Initialize gallery when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // The gallery is now populated by the main.js file
+            console.log('Gallery initialized');
+        });
+    </script>
+</body>
+</html>

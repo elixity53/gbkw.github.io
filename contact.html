@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Gentle Bear Knifeworks</title>
+    <meta name="description" content="Contact Jamaal Simpson for custom knife orders. Professional blacksmithing services with traditional craftsmanship.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <style>
+        :root {
+            --charcoal-black: #1B1B1B;
+            --burnt-orange: #D96B2B;
+            --gunmetal-gray: #2E2E2E;
+            --warm-white: #F5F3EF;
+            --forge-red: #B85450;
+            --steel-blue: #4A5568;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--charcoal-black);
+            color: var(--warm-white);
+            overflow-x: hidden;
+        }
+        
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-bebas { font-family: 'Bebas Neue', cursive; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--charcoal-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--burnt-orange);
+            border-radius: 4px;
+        }
+        
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--burnt-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Contact cards */
+        .contact-card {
+            background-color: var(--gunmetal-gray);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid rgba(217, 107, 43, 0.2);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(217, 107, 43, 0.2);
+            border-color: var(--burnt-orange);
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--burnt-orange), var(--forge-red));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in-up.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* FAQ styles */
+        .faq-item {
+            background-color: var(--gunmetal-gray);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid rgba(217, 107, 43, 0.1);
+        }
+        
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background-color: rgba(217, 107, 43, 0.1);
+        }
+        
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-answer.open {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 200px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="nav-link text-white hover:text-orange-400">About</a>
+                    <a href="contact.html" class="nav-link active text-white hover:text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden mobile-menu-btn text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4 pb-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="text-white hover:text-orange-400">About</a>
+                    <a href="contact.html" class="text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 bg-gray-900">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto fade-in-up">
+                <h1 class="font-cinzel text-4xl md:text-6xl font-bold mb-6 text-white">
+                    Get In Touch
+                </h1>
+                <p class="text-xl text-gray-400 mb-8 leading-relaxed">
+                    Ready to discuss your custom knife or have questions about our craft? Jamaul Simpson is here to help bring your vision to life.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#contact-info" class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg inline-block">
+                        Contact Information
+                    </a>
+                    <a href="#faq" class="px-8 py-4 rounded-lg border-2 border-orange-600 text-orange-400 font-semibold text-lg hover:bg-orange-600 hover:text-white transition-colors inline-block">
+                        View FAQ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Information -->
+    <section id="contact-info" class="py-20 bg-black">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                    Contact Information
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Multiple ways to reach Jamaul Simpson and start your custom knife journey.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <!-- Email -->
+                <div class="contact-card fade-in-up">
+                    <div class="text-4xl mb-4">📧</div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Email</h3>
+                    <p class="text-gray-400 mb-4">Best for detailed inquiries and custom requests</p>
+                    <a href="mailto:Jamaulsimp@gmail.com" class="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                        Jamaulsimp@gmail.com
+                    </a>
+                </div>
+                
+                <!-- Phone -->
+                <div class="contact-card fade-in-up">
+                    <div class="text-4xl mb-4">📞</div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Phone</h3>
+                    <p class="text-gray-400 mb-4">Quick questions and immediate consultation</p>
+                    <a href="tel:+15059070229" class="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                        (505) 907-0229
+                    </a>
+                </div>
+                
+                <!-- Instagram -->
+                <div class="contact-card fade-in-up">
+                    <div class="text-4xl mb-4">📸</div>
+                    <h3 class="font-cinzel text-xl font-bold text-white mb-2">Instagram</h3>
+                    <p class="text-gray-400 mb-4">See latest work and behind-the-scenes content</p>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+                        @Gentle_bear_knifeworks
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Additional Contact Info -->
+            <div class="text-center fade-in-up">
+                <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-auto">
+                    <h3 class="font-cinzel text-2xl font-bold text-white mb-4">Business Information</h3>
+                    <div class="space-y-3 text-gray-400">
+                        <p><strong>Owner:</strong> Jamaul Simpson</p>
+                        <p><strong>Location:</strong> New Mexico, USA</p>
+                        <p><strong>Specialization:</strong> Custom handmade knives, hunting knives, chef knives</p>
+                        <p><strong>Experience:</strong> 1+ years of traditional blacksmithing</p>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        <p class="text-orange-400 font-semibold">
+                            "Forged with Patience. Built to Endure."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                        Frequently Asked Questions
+                    </h2>
+                    <p class="text-xl text-gray-400">
+                        Everything you need to know about custom knife orders and our services.
+                    </p>
+                </div>
+                
+                <div class="space-y-4 fade-in-up">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">How long does a custom knife take to make?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                Typical lead time is 3-4 months from order confirmation to delivery. This includes design consultation, material sourcing, forging, and finishing. Rush orders may be available for an additional fee.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">What's the average cost of a custom knife?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                Custom knives typically range from $300-$800 depending on materials, complexity, and size. Simple hunting knives start around $300, while elaborate chef knives or Damascus steel blades can be $600+. All quotes include sheath and shipping.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">Do you require a deposit?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                Yes, a 50% deposit is required to begin work on your custom knife. This covers material costs and secures your place in the production queue. The balance is due upon completion, before shipping.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">Can I see the progress of my knife?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                Absolutely! I provide regular photo updates throughout the forging process. You'll see everything from the initial steel heating to the final polishing. It's part of the experience of commissioning a handmade knife.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">Do you make left-handed knives?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                Yes! I can create knives optimized for left-handed users, including handle shaping, guard orientation, and sheath design. This is one of the advantages of commissioning a truly custom knife.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <h3 class="font-cinzel text-lg font-bold text-white">Do you offer knife sharpening services?</h3>
+                            <svg class="w-5 h-5 text-orange-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-400">
+                                I provide lifetime sharpening for all knives I create. Simply ship the knife back to me (or bring it if you're local) and I'll return it razor-sharp. This service is free for the original owner, you just cover shipping costs.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action -->
+    <section class="py-20 bg-black">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-6 text-white">
+                    Ready to Start Your Journey?
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Every masterpiece starts with a single conversation. Reach out today and let's create something extraordinary together.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="mailto:Jamaulsimp@gmail.com" class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg inline-block">
+                        Send Email
+                    </a>
+                    <a href="tel:+15059070229" class="px-8 py-4 rounded-lg border-2 border-orange-600 text-orange-400 font-semibold text-lg hover:bg-orange-600 hover:text-white transition-colors inline-block">
+                        Call Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <!-- Logo -->
+                <div class="flex items-center justify-center space-x-2 mb-6">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-2">Jamaal Simpson - Master Bladesmith</p>
+                    <p class="text-gray-400 mb-2">
+                        <a href="mailto:Jamaulsimp@gmail.com" class="hover:text-orange-400 transition-colors">
+                            Jamaulsimp@gmail.com
+                        </a>
+                    </p>
+                    <p class="text-gray-400 mb-4">
+                        <a href="tel:+15059070229" class="hover:text-orange-400 transition-colors">
+                            (505) 907-0229
+                        </a>
+                    </p>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center space-x-6 mb-6">
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-gray-400 hover:text-orange-400 transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Tagline -->
+                <p class="font-cinzel text-lg text-orange-400 mb-2">
+                    "Forged with Patience. Built to Endure."
+                </p>
+                
+                <!-- Copyright -->
+                <p class="text-gray-500 text-sm">
+                    © 2024 Gentle Bear Knifeworks. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+    <script>
+        // FAQ Toggle Function
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('svg');
+            
+            if (answer.classList.contains('open')) {
+                answer.classList.remove('open');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // Close all other FAQ items
+                document.querySelectorAll('.faq-answer.open').forEach(item => {
+                    item.classList.remove('open');
+                });
+                document.querySelectorAll('.faq-question svg').forEach(svg => {
+                    svg.style.transform = 'rotate(0deg)';
+                });
+                
+                // Open clicked item
+                answer.classList.add('open');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    </script>
+</body>
+</html>

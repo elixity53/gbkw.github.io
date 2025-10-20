@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Gentle Bear Knifeworks</title>
+    <meta name="description" content="Learn about Jamaul Simpson's journey in traditional blacksmithing and the philosophy behind Gentle Bear Knifeworks.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+    
+    <style>
+        :root {
+            --charcoal-black: #1B1B1B;
+            --burnt-orange: #D96B2B;
+            --gunmetal-gray: #2E2E2E;
+            --warm-white: #F5F3EF;
+            --forge-red: #B85450;
+            --steel-blue: #4A5568;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--charcoal-black);
+            color: var(--warm-white);
+            overflow-x: hidden;
+        }
+        
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-bebas { font-family: 'Bebas Neue', cursive; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--charcoal-black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--burnt-orange);
+            border-radius: 4px;
+        }
+        
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--burnt-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        /* Hero portrait */
+        .portrait-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .portrait-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--burnt-orange), var(--forge-red));
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        /* Process timeline */
+        .process-timeline {
+            position: relative;
+        }
+        
+        .process-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--burnt-orange), var(--forge-red));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            width: 16px;
+            height: 16px;
+            background-color: var(--burnt-orange);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        
+        .timeline-content {
+            width: 45%;
+            padding: 2rem;
+            background-color: var(--gunmetal-gray);
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 55%;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-right: 55%;
+        }
+        
+        /* Steel properties chart */
+        .steel-chart {
+            background-color: var(--gunmetal-gray);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+        
+        /* Material cards */
+        .material-card {
+            background-color: var(--gunmetal-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(217, 107, 43, 0.2);
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--burnt-orange), var(--forge-red));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in-up.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .process-timeline::before {
+                left: 2rem;
+            }
+            
+            .timeline-item::before {
+                left: 2rem;
+            }
+            
+            .timeline-content {
+                width: calc(100% - 4rem);
+                margin-left: 4rem !important;
+                margin-right: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="nav-link active text-white hover:text-orange-400">About</a>
+                    <a href="contact.html" class="nav-link text-white hover:text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden mobile-menu-btn text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden mt-4 pb-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="index.html" class="text-white hover:text-orange-400">Home</a>
+                    <a href="about.html" class="text-orange-400">About</a>
+                    <a href="contact.html" class="text-white hover:text-orange-400">Contact</a>
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-white hover:text-orange-400">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Portrait -->
+                <div class="fade-in-up">
+                    <div class="portrait-container">
+                        <img src="resources/maker-portrait.png" 
+                             alt="Jamaul Simpson - Master Bladesmith" 
+                             class="w-full h-auto rounded-lg">
+                    </div>
+                </div>
+                
+                <!-- Story -->
+                <div class="fade-in-up">
+                    <h1 class="font-cinzel text-4xl md:text-5xl font-bold mb-6 text-white">
+                        The Maker Behind the Blade
+                    </h1>
+                    <p class="text-lg text-gray-400 mb-6 leading-relaxed">
+                        In the heart of New Mexico, where the desert meets the mountains, Jamaul Simpson crafts more than just knives—he creates heirlooms. Each blade that leaves his forge carries the weight of tradition and the spark of innovation.
+                    </p>
+                    <p class="text-lg text-gray-400 mb-6 leading-relaxed">
+                        "Every piece of steel has its own personality," Jamaul often says. "My job is to listen to what it wants to become, then guide it there with patience, fire, and skill."
+                    </p>
+                    <p class="text-lg text-gray-400 mb-8 leading-relaxed">
+                        From hunting knives that will accompany adventurers into the wilderness, to chef knives that will create countless meals for families, each creation is a testament to the enduring art of bladesmithing.
+                    </p>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-400">100+</div>
+                            <div class="text-sm text-gray-400">Blades Forged</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-400">1</div>
+                            <div class="text-sm text-gray-400">Year Experience</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-orange-400">100%</div>
+                            <div class="text-sm text-gray-400">Handcrafted</div>
+                        </div>
+                    </div>
+                    
+                    <a href="contact.html" class="btn-primary inline-block px-8 py-4 rounded-lg text-white font-semibold text-lg">
+                        Commission Your Blade
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Philosophy Section -->
+    <section class="py-20 bg-black">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-8 text-white">
+                    Craftsmanship Philosophy
+                </h2>
+                <p class="text-xl text-gray-400 mb-8 leading-relaxed">
+                    "At Gentle Bear Knifeworks, we believe that a knife is more than a tool—it's an extension of the craftsman's soul. Every hammer strike, every heat treatment, every polish is performed with intention and respect for the materials.
+                </p>
+                <p class="text-xl text-gray-400 mb-12 leading-relaxed">
+                    We don't mass-produce. We don't cut corners. We create blades that will outlive their owners, carrying stories and memories in their steel."
+                </p>
+                
+                <!-- Philosophy Points -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="material-card">
+                        <div class="text-3xl mb-4">🔥</div>
+                        <h3 class="font-cinzel text-xl font-bold text-white mb-2">Traditional Methods</h3>
+                        <p class="text-gray-400">
+                            Hand-forging techniques passed down through generations of master smiths, ensuring each blade carries the wisdom of centuries.
+                        </p>
+                    </div>
+                    
+                    <div class="material-card">
+                        <div class="text-3xl mb-4">⭐</div>
+                        <h3 class="font-cinzel text-xl font-bold text-white mb-2">Premium Materials</h3>
+                        <p class="text-gray-400">
+                            Only the finest steels and handle materials make the cut, sourced from trusted suppliers who share our commitment to quality.
+                        </p>
+                    </div>
+                    
+                    <div class="material-card">
+                        <div class="text-3xl mb-4">🎯</div>
+                        <h3 class="font-cinzel text-xl font-bold text-white mb-2">Personal Touch</h3>
+                        <p class="text-gray-400">
+                            Every knife is made to order, with attention to the specific needs and preferences of the individual who will wield it.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Detailed Process Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                    The Forging Process
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    From raw steel to finished masterpiece, every step is performed with precision and care.
+                </p>
+            </div>
+            
+            <div class="process-timeline">
+                <!-- Step 1 -->
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-content">
+                        <div class="flex items-center mb-4">
+                            <span class="text-2xl mr-3">🔥</span>
+                            <h3 class="font-cinzel text-2xl font-bold text-white">The Forge Ignites</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">
+                            The journey begins with heating the steel to 2200°F in a propane forge. This critical first step transforms the molecular structure of the metal, making it malleable and ready to be shaped. Temperature control is crucial—too hot and the steel burns, too cool and it won't move properly under the hammer.
+                        </p>
+                        <div class="text-sm text-orange-400">
+                            <strong>Duration:</strong> 15-30 minutes • <strong>Temperature:</strong> 2200°F
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-content">
+                        <div class="flex items-center mb-4">
+                            <span class="text-2xl mr-3">🔨</span>
+                            <h3 class="font-cinzel text-2xl font-bold text-white">Shaping the Steel</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">
+                            With the steel glowing orange-hot, it's time for the rhythmic dance of hammer and anvil. Each strike is deliberate, slowly drawing out the blade's profile and establishing the basic geometry. This is where experience truly matters—knowing how the steel moves, understanding the grain structure, and feeling the right moment to reheat.
+                        </p>
+                        <div class="text-sm text-orange-400">
+                            <strong>Hammer Weight:</strong> 2-4 lbs • <strong>Strikes:</strong> 200-500 per blade
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-content">
+                        <div class="flex items-center mb-4">
+                            <span class="text-2xl mr-3">⚡</span>
+                            <h3 class="font-cinzel text-2xl font-bold text-white">Grinding & Sharpening</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">
+                            Once the basic shape is forged, the blade moves to the grinder. Here, precision takes over from brute force. The edge geometry is carefully established, the spine is refined, and the blade's final dimensions are set. Multiple grits of abrasive are used, from coarse shaping to fine finishing, each revealing more of the blade's character.
+                        </p>
+                        <div class="text-sm text-orange-400">
+                            <strong>Grit Range:</strong> 36-400 • <strong>Precision:</strong> ±0.1mm
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-content">
+                        <div class="flex items-center mb-4">
+                            <span class="text-2xl mr-3">🌳</span>
+                            <h3 class="font-cinzel text-2xl font-bold text-white">Handle Crafting</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">
+                            While the blade undergoes heat treatment, attention turns to the handle. Whether it's desert ironwood, micarta, or stag horn, each material is carefully selected for beauty and function. The handle is shaped to fit the hand perfectly, sanded to a silky smoothness, and finished with oils or resins that will protect it for generations.
+                        </p>
+                        <div class="text-sm text-orange-400">
+                            <strong>Materials:</strong> Wood, Micarta, Bone • <strong>Finish:</strong> Hand-rubbed oil
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 5 -->
+                <div class="timeline-item fade-in-up">
+                    <div class="timeline-content">
+                        <div class="flex items-center mb-4">
+                            <span class="text-2xl mr-3">✨</span>
+                            <h3 class="font-cinzel text-2xl font-bold text-white">Final Touch</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">
+                            The blade receives its final heat treatment—a carefully controlled heating and cooling process that gives the steel its optimal hardness and toughness. After tempering to relieve stress, the blade is polished to reveal its true beauty. The Gentle Bear logo is engraved, the handle is fitted and secured, and the knife receives its final sharpening. What emerges is not just a tool, but a work of functional art.
+                        </p>
+                        <div class="text-sm text-orange-400">
+                            <strong>Hardness:</strong> 58-62 HRC • <strong>Sharpness:</strong> Razor edge
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Steel Types Section -->
+    <section class="py-20 bg-black">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                    Steel Types & Properties
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    Understanding the materials that make exceptional blades.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Steel Properties Chart -->
+                <div class="fade-in-up">
+                    <div class="steel-chart">
+                        <h3 class="font-cinzel text-2xl font-bold text-white mb-6">Steel Comparison</h3>
+                        <div id="steel-chart" style="height: 400px;"></div>
+                    </div>
+                </div>
+                
+                <!-- Steel Types -->
+                <div class="fade-in-up">
+                    <div class="space-y-6">
+                        <div class="material-card">
+                            <h4 class="font-cinzel text-xl font-bold text-white mb-2">1095 Carbon Steel</h4>
+                            <p class="text-gray-400 mb-3">
+                                High-carbon steel known for excellent edge retention and toughness. Perfect for hunting and survival knives that need to hold up to heavy use.
+                            </p>
+                            <div class="text-sm text-orange-400">
+                                <strong>Hardness:</strong> 57-59 HRC • <strong>Best for:</strong> Hunting knives, heavy-duty use
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="font-cinzel text-xl font-bold text-white mb-2">1084 Carbon Steel</h4>
+                            <p class="text-gray-400 mb-3">
+                                Versatile high-carbon steel with excellent wear resistance and edge stability. Great for everyday carry and utility knives.
+                            </p>
+                            <div class="text-sm text-orange-400">
+                                <strong>Hardness:</strong> 58-60 HRC • <strong>Best for:</strong> EDC knives, utility blades
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="font-cinzel text-xl font-bold text-white mb-2">15N20 Steel</h4>
+                            <p class="text-gray-400 mb-3">
+                                Nickel-alloy steel with excellent toughness and corrosion resistance. Often used in Damascus patterns for contrast and durability.
+                            </p>
+                            <div class="text-sm text-orange-400">
+                                <strong>Hardness:</strong> 59-61 HRC • <strong>Best for:</strong> Damascus patterns, tough blades
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <h4 class="font-cinzel text-xl font-bold text-white mb-2">Hand-Forged Damascus</h4>
+                            <p class="text-gray-400 mb-3">
+                                Pattern-welded steel combining multiple layers for superior strength and stunning visual appeal. Each pattern is unique and hand-forged.
+                            </p>
+                            <div class="text-sm text-orange-400">
+                                <strong>Layers:</strong> 200+ • <strong>Best for:</strong> Chef knives, collectors, show pieces
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Handle Materials Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-4 text-white">
+                    Handle Materials
+                </h2>
+                <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+                    From traditional woods to modern composites, each material offers unique characteristics.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="material-card text-center">
+                    <div class="text-3xl mb-4">🌳</div>
+                    <h4 class="font-cinzel text-lg font-bold text-white mb-2">Desert Ironwood</h4>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Dense, durable wood with beautiful grain patterns. Naturally water-resistant and ages to a deep patina.
+                    </p>
+                    <div class="text-xs text-orange-400">
+                        Durability: ★★★★★ • Weight: Medium
+                    </div>
+                </div>
+                
+                <div class="material-card text-center">
+                    <div class="text-3xl mb-4">🦌</div>
+                    <h4 class="font-cinzel text-lg font-bold text-white mb-2">Stag Horn</h4>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Natural antler material providing excellent grip even when wet. Each piece is unique in texture and color.
+                    </p>
+                    <div class="text-xs text-orange-400">
+                        Grip: ★★★★★ • Weight: Light
+                    </div>
+                </div>
+                
+                <div class="material-card text-center">
+                    <div class="text-3xl mb-4">🧵</div>
+                    <h4 class="font-cinzel text-lg font-bold text-white mb-2">Micarta</h4>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Layered fabric and resin composite that's virtually indestructible. Available in various colors and textures.
+                    </p>
+                    <div class="text-xs text-orange-400">
+                        Durability: ★★★★★ • Maintenance: Low
+                    </div>
+                </div>
+                
+                <div class="material-card text-center">
+                    <div class="text-3xl mb-4">🌰</div>
+                    <h4 class="font-cinzel text-lg font-bold text-white mb-2">Black Walnut</h4>
+                    <p class="text-gray-400 text-sm mb-3">
+                        Classic American hardwood with rich, dark color. Easy to work and finishes beautifully with natural oils.
+                    </p>
+                    <div class="text-xs text-orange-400">
+                        Beauty: ★★★★☆ • Workability: High
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action -->
+    <section class="py-20 bg-black">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-3xl mx-auto fade-in-up">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold mb-6 text-white">
+                    Ready to Start Your Journey?
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Every great knife begins with a conversation. Let's discuss your vision and create something extraordinary together.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="contact.html" class="btn-primary px-8 py-4 rounded-lg text-white font-semibold text-lg inline-block">
+                        Start Your Custom Order
+                    </a>
+                    <a href="index.html" class="px-8 py-4 rounded-lg border-2 border-orange-600 text-orange-400 font-semibold text-lg hover:bg-orange-600 hover:text-white transition-colors inline-block">
+                        View Our Portfolio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <!-- Logo -->
+                <div class="flex items-center justify-center space-x-2 mb-6">
+                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">🐻</span>
+                    </div>
+                    <span class="font-cinzel text-xl font-bold text-white">Gentle Bear Knifeworks</span>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-2">Jamaul Simpson - Master Bladesmith</p>
+                    <p class="text-gray-400 mb-2">
+                        <a href="mailto:Jamaulsimp@gmail.com" class="hover:text-orange-400 transition-colors">
+                            Jamaulsimp@gmail.com
+                        </a>
+                    </p>
+                    <p class="text-gray-400 mb-4">
+                        <a href="tel:+15059070229" class="hover:text-orange-400 transition-colors">
+                            (505) 907-0229
+                        </a>
+                    </p>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center space-x-6 mb-6">
+                    <a href="https://instagram.com/Gentle_bear_knifeworks" target="_blank" class="text-gray-400 hover:text-orange-400 transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.928-.875-1.418-2.026-1.418-3.323s.49-2.448 1.418-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.928.875 1.418 2.026 1.418 3.323s-.49 2.448-1.418 3.323z"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <!-- Tagline -->
+                <p class="font-cinzel text-lg text-orange-400 mb-2">
+                    "Forged with Patience. Built to Endure."
+                </p>
+                
+                <!-- Copyright -->
+                <p class="text-gray-500 text-sm">
+                    © 2024 Gentle Bear Knifeworks. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+    <script>
+        // Initialize steel properties chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartDom = document.getElementById('steel-chart');
+            if (chartDom && typeof echarts !== 'undefined') {
+                const myChart = echarts.init(chartDom);
+                
+                const option = {
+                    backgroundColor: 'transparent',
+                    textStyle: {
+                        color: '#F5F3EF'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: '#2E2E2E',
+                        borderColor: '#D96B2B',
+                        textStyle: {
+                            color: '#F5F3EF'
+                        }
+                    },
+                    legend: {
+                        data: ['Edge Retention', 'Toughness', 'Corrosion Resistance'],
+                        textStyle: {
+                            color: '#F5F3EF'
+                        }
+                    },
+                    radar: {
+                        indicator: [
+                            { name: '1095 Carbon', max: 100 },
+                            { name: '1084 Carbon', max: 100 },
+                            { name: '15N20 Steel', max: 100 },
+                            { name: 'Damascus', max: 100 },
+                            { name: 'Tool Steels', max: 100 }
+                        ],
+                        axisName: {
+                            color: '#F5F3EF'
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#2E2E2E'
+                            }
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#2E2E2E'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Steel Properties',
+                        type: 'radar',
+                        data: [
+                            {
+                                value: [90, 85, 80, 95, 75],
+                                name: 'Edge Retention',
+                                itemStyle: {
+                                    color: '#D96B2B'
+                                }
+                            },
+                            {
+                                value: [85, 90, 95, 80, 85],
+                                name: 'Toughness',
+                                itemStyle: {
+                                    color: '#B85450'
+                                }
+                            },
+                            {
+                                value: [25, 30, 85, 40, 60],
+                                name: 'Corrosion Resistance',
+                                itemStyle: {
+                                    color: '#4A5568'
+                                }
+                            }
+                        ]
+                    }]
+                };
+                
+                myChart.setOption(option);
+                
+                // Resize chart on window resize
+                window.addEventListener('resize', function() {
+                    myChart.resize();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
