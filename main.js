@@ -1,8 +1,10 @@
-// main.js
+// main.js — safe gallery renderer that won't touch other content or animations.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import {
+  getFirestore, doc, getDoc, collection, getDocs, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-// ---------- Firebase CONFIG (as provided) ----------
+// ---------- Firebase CONFIG (yours) ----------
 const firebaseConfig = {
   apiKey: "AIzaSyAwabcTi-vGohLNC3n3FeflbtEs5pZ8y3s",
   authDomain: "gbkw-site.firebaseapp.com",
@@ -11,40 +13,34 @@ const firebaseConfig = {
   messagingSenderId: "497739601087",
   appId: "1:497739601087:web:838db175b2ec970ccca20a"
 };
-// ---------------------------------------------------
+// --------------------------------------------
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app, db;
 
-function esc(s){return (s||"").toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-async function loadSchema() {
-  const cfg = await getDoc(doc(db, "config", "gallery"));
-  return cfg.exists() ? (cfg.data().fields || []) : [];
+// Utility: escape HTML
+function esc(s) {
+  return (s || "").toString().replace(/[&<>"']/g, c => (
+    { "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" }[c]
+  ));
 }
 
-async function loadItems() {
-  const qy = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(qy);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-// Default simple card (only used if you don't provide your own markup/template)
+// Render one card (fallback if you don't provide your own template)
 function renderDefaultCard({ title, image, attrs, fields }) {
-  const li = fields.map(f => attrs[f] ? `<li><strong>${esc(f)}:</strong> ${esc(attrs[f])}</li>` : "").join("");
+  const li = fields
+    .map(f => attrs[f] ? `<li><strong>${esc(f)}:</strong> ${esc(attrs[f])}</li>` : "")
+    .join("");
   return `
     <article class="card">
       <div class="media">${image ? `<img src="${esc(image)}" alt="${esc(title||'')}" />` : ""}</div>
       <div class="body">
-        <h3 class="title">${esc(title||"(untitled)")}</h3>
+        <h3 class="title">${esc(title || "(untitled)")}</h3>
         <ul class="specs">${li}</ul>
       </div>
     </article>
   `;
 }
 
-// If you have <template id="gb-card-template"> in your index.html, we use it.
-// Otherwise we fall back to the default card above, so your existing index stays intact.
+// If a <template id="gb-card-template"> exists in index.html, use it
 function renderWithTemplate(tpl, { title, image, attrs, fields }) {
   const node = tpl.content.cloneNode(true);
   const titleEl = node.querySelector(".title");
@@ -60,43 +56,83 @@ function renderWithTemplate(tpl, { title, image, attrs, fields }) {
   return node;
 }
 
-async function renderGallery() {
-  const mount = document.getElementById("gallery");
-  if (!mount) return; // if your page doesn't have a gallery, do nothing
+// Load config + items
+async function loadSchema() {
+  const cfg = await getDoc(doc(db, "config", "gallery"));
+  return cfg.exists() ? (cfg.data().fields || []) : [];
+}
+async function loadItems() {
+  const qy = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(qy);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
 
-  const emptyText = mount.dataset.emptyText || "No items.";
-  mount.innerHTML = "";
+// Main render (non-destructive)
+async function renderGallery() {
+  // Only run if a gallery mount exists
+  const mount = document.getElementById("gallery");
+  if (!mount) return;
+
+  // Create (or reuse) a private child so we don't touch the mount's existing content
+  let inner = mount.querySelector(":scope > .gbkw-gallery-inner");
+  if (!inner) {
+    inner = document.createElement("div");
+    inner.className = "gbkw-gallery-inner";
+    // Append without clearing existing HTML/animations inside #gallery
+    mount.appendChild(inner);
+  }
+
+  // Optional hint for empty text (won't create if you already place your own content)
+  const emptyText = mount.getAttribute("data-empty-text") || "";
 
   try {
     const [fields, items] = await Promise.all([loadSchema(), loadItems()]);
+
+    // Build new content in memory
+    const frag = document.createDocumentFragment();
+    const tpl = document.getElementById("gb-card-template");
+
     if (!items.length) {
-      mount.innerHTML = `<p class="muted">${esc(emptyText)}</p>`;
-      return;
+      // If you want to keep your own empty state, do nothing.
+      // Only inject a lightweight message if you provided data-empty-text.
+      if (emptyText) {
+        const p = document.createElement("p");
+        p.className = "muted";
+        p.textContent = emptyText;
+        frag.appendChild(p);
+      }
+    } else {
+      items.forEach(it => {
+        const title = it.title || "";
+        const image = (it.images && it.images[0]) || "";
+        const attrs = it.attributes || {};
+        if (tpl) {
+          frag.appendChild(renderWithTemplate(tpl, { title, image, attrs, fields }));
+        } else {
+          const wrap = document.createElement("div");
+          wrap.innerHTML = renderDefaultCard({ title, image, attrs, fields });
+          frag.appendChild(wrap.firstElementChild);
+        }
+      });
     }
 
-    const tpl = document.getElementById("gb-card-template");
-    const frag = document.createDocumentFragment();
+    // Replace only our private child content (NOT the mount, NOT anything else)
+    inner.replaceChildren(frag);
 
-    items.forEach(it => {
-      const title = it.title || "";
-      const image = (it.images && it.images[0]) || "";
-      const attrs = it.attributes || {};
-
-      if (tpl) {
-        frag.appendChild(renderWithTemplate(tpl, { title, image, attrs, fields }));
-      } else {
-        const wrapper = document.createElement("div");
-        wrapper.className = "gb-card-wrap";
-        wrapper.innerHTML = renderDefaultCard({ title, image, attrs, fields });
-        frag.appendChild(wrapper.firstElementChild);
-      }
-    });
-
-    mount.appendChild(frag);
   } catch (err) {
+    // Fail safe: log error but don't alter existing content/animations
     console.error("Gallery render error:", err);
-    mount.innerHTML = `<p class="muted">Unable to load gallery.</p>`;
   }
 }
 
-renderGallery();
+// Boot after DOM is ready so we don't interfere with other scripts/animations
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+  } catch (e) {
+    console.error("Firebase init error:", e);
+    return;
+  }
+  renderGallery();
+});
