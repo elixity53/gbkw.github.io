@@ -96,6 +96,18 @@
             box-shadow: 0 0 0 3px rgba(217, 107, 43, 0.1);
         }
         
+        .attr-badge {
+            display: inline-block;
+            background-color: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--warm-white);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
         .hidden {
             display: none;
         }
@@ -156,9 +168,30 @@
                         </div>
                     </div>
                     
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Steel Type</label>
+                            <input type="text" id="photo-steel" class="form-input" placeholder="e.g., 1095 High Carbon">
+                        </div>
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Handle Material</label>
+                            <input type="text" id="photo-handle" class="form-input" placeholder="e.g., Desert Ironwood">
+                        </div>
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Length</label>
+                            <div class="flex space-x-2">
+                                <input type="number" id="photo-length-value" class="form-input" placeholder="e.g., 8.5" min="0" step="0.1">
+                                <select id="photo-length-unit" class="form-input" style="width:120px;">
+                                    <option value="in">in</option>
+                                    <option value="cm">cm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="mb-6">
                         <label class="block text-white font-semibold mb-2">Description</label>
-                        <textarea id="photo-description" class="form-input" rows="3" placeholder="Steel type, handle material, length, and other details..."></textarea>
+                        <textarea id="photo-description" class="form-input" rows="3" placeholder="Optional notes or extra details..."></textarea>
                     </div>
                     
                     <div class="flex space-x-4">
@@ -211,7 +244,7 @@
                 
                 <div>
                     <h4 class="font-semibold text-white mb-2">2. Add Details</h4>
-                    <p>Fill in the title, category, and description for each photo to create a complete gallery entry.</p>
+                    <p>Fill in the title, category, steel type, handle material, length and a short description for each photo.</p>
                 </div>
                 
                 <div>
@@ -221,7 +254,7 @@
                 
                 <div>
                     <h4 class="font-semibold text-white mb-2">4. Export Data</h4>
-                    <p>Use the Export Data button to get the code needed for your website.</p>
+                    <p>Use the Export Data button to get the code needed for your website. The export now includes steel, handle, and length fields.</p>
                 </div>
                 
                 <div>
@@ -251,7 +284,7 @@
     </footer>
     
     <script>
-        // Photo management system
+        // Photo management system with structured attributes: steel, handle, length
         let photos = JSON.parse(localStorage.getItem('knifePhotos') || '[]');
         let currentFile = null;
         
@@ -262,7 +295,11 @@
                     id: 1,
                     title: "The Ember Hunter",
                     category: "hunting",
-                    description: "1095 High Carbon Steel • Desert Ironwood Handle • 8.5 inches",
+                    description: "Classic drop point hunting knife.",
+                    steel: "1095 High Carbon",
+                    handle: "Desert Ironwood",
+                    lengthValue: 8.5,
+                    lengthUnit: "in",
                     image: "https://kimi-web-img.moonshot.cn/img/aaknives.eu/fbbd1d79fa131aa2c1b81d5bfb7ed18a13531e19.jpg",
                     dateAdded: new Date().toISOString()
                 },
@@ -270,7 +307,11 @@
                     id: 2,
                     title: "Damascus Chef's Pride",
                     category: "chef",
-                    description: "Hand-forged Damascus • Micarta Composite Handle • 10 inches",
+                    description: "Beautifully patterned damascus chef's knife.",
+                    steel: "Damascus (multi-layer)",
+                    handle: "Micarta Composite",
+                    lengthValue: 10,
+                    lengthUnit: "in",
                     image: "https://kimi-web-img.moonshot.cn/img/cdn.shopify.com/0b04f3e57473cc8f0b41177b0a8ee348a9d27f8c.jpg",
                     dateAdded: new Date().toISOString()
                 },
@@ -278,7 +319,11 @@
                     id: 3,
                     title: "The Gentle Bear",
                     category: "custom",
-                    description: "1084 Carbon Steel • Black Walnut Handle • 9 inches",
+                    description: "Signature custom design by Gentle Bear.",
+                    steel: "1084 Carbon Steel",
+                    handle: "Black Walnut",
+                    lengthValue: 9,
+                    lengthUnit: "in",
                     image: "https://kimi-web-img.moonshot.cn/img/cdn.shopify.com/d1320db6dc02e4f545adb9eec3b1525ed13dffb3.webp",
                     dateAdded: new Date().toISOString()
                 }
@@ -343,21 +388,29 @@
             // Show form
             document.getElementById('photo-form').classList.remove('hidden');
             
-            // Preview image
+            // Preview image (not shown in UI for now, but FileReader used for validation)
             const reader = new FileReader();
             reader.onload = function(e) {
-                // You could add a preview here if needed
+                // preview could be placed here
             };
             reader.readAsDataURL(file);
         }
         
         // Add photo
         function addPhoto() {
-            if (!currentFile) return;
+            if (!currentFile) {
+                alert('Please select an image before adding.');
+                return;
+            }
             
             const title = document.getElementById('photo-title').value.trim();
             const category = document.getElementById('photo-category').value;
             const description = document.getElementById('photo-description').value.trim();
+            const steel = document.getElementById('photo-steel').value.trim();
+            const handle = document.getElementById('photo-handle').value.trim();
+            const lengthValueRaw = document.getElementById('photo-length-value').value;
+            const lengthValue = lengthValueRaw ? parseFloat(lengthValueRaw) : null;
+            const lengthUnit = document.getElementById('photo-length-unit').value;
             
             if (!title) {
                 alert('Please enter a title for the photo.');
@@ -372,6 +425,10 @@
                     title: title,
                     category: category,
                     description: description,
+                    steel: steel || '',
+                    handle: handle || '',
+                    lengthValue: lengthValue !== null ? lengthValue : '',
+                    lengthUnit: lengthValue !== null ? lengthUnit : '',
                     image: e.target.result,
                     dateAdded: new Date().toISOString()
                 };
@@ -390,7 +447,14 @@
             document.getElementById('photo-form').classList.add('hidden');
             document.getElementById('photo-title').value = '';
             document.getElementById('photo-description').value = '';
+            document.getElementById('photo-steel').value = '';
+            document.getElementById('photo-handle').value = '';
+            document.getElementById('photo-length-value').value = '';
+            document.getElementById('photo-length-unit').value = 'in';
             currentFile = null;
+            // clear file input so same file can be reselected
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) fileInput.value = '';
         }
         
         // Display photos
@@ -398,7 +462,7 @@
             const grid = document.getElementById('photos-grid');
             const emptyState = document.getElementById('empty-state');
             
-            if (photos.length === 0) {
+            if (!photos || photos.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
@@ -406,13 +470,25 @@
             
             emptyState.classList.add('hidden');
             
-            grid.innerHTML = photos.map(photo => `
+            grid.innerHTML = photos.map(photo => {
+                const steelTxt = photo.steel ? `<span class="attr-badge">Steel: ${escapeHtml(photo.steel)}</span>` : '';
+                const handleTxt = photo.handle ? `<span class="attr-badge">Handle: ${escapeHtml(photo.handle)}</span>` : '';
+                const lengthTxt = (photo.lengthValue || photo.lengthValue === 0) && photo.lengthUnit ? `<span class="attr-badge">Length: ${escapeHtml(String(photo.lengthValue))} ${escapeHtml(photo.lengthUnit)}</span>` : '';
+                
+                const desc = photo.description ? `<p class="text-sm text-gray-400">${escapeHtml(photo.description)}</p>` : '';
+                
+                return `
                 <div class="photo-item">
-                    <img src="${photo.image}" alt="${photo.title}">
+                    <img src="${photo.image}" alt="${escapeHtml(photo.title)}">
                     <div class="mb-4">
-                        <h3 class="font-bold text-white mb-1">${photo.title}</h3>
-                        <p class="text-sm text-orange-400 mb-2">${photo.category}</p>
-                        <p class="text-sm text-gray-400">${photo.description}</p>
+                        <h3 class="font-bold text-white mb-1">${escapeHtml(photo.title)}</h3>
+                        <p class="text-sm text-orange-400 mb-2">${escapeHtml(photo.category || '')}</p>
+                        ${desc}
+                        <div class="mt-2">
+                            ${steelTxt}
+                            ${handleTxt}
+                            ${lengthTxt}
+                        </div>
                     </div>
                     <div class="flex space-x-2">
                         <button onclick="editPhoto(${photo.id})" class="btn-primary flex-1 py-2 px-3 rounded text-sm text-white font-semibold">
@@ -423,7 +499,8 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
         
         // Update photo count
@@ -431,7 +508,7 @@
             document.getElementById('photo-count').textContent = photos.length;
         }
         
-        // Edit photo
+        // Edit photo - prompts for structured fields
         function editPhoto(id) {
             const photo = photos.find(p => p.id === id);
             if (!photo) return;
@@ -439,11 +516,33 @@
             const newTitle = prompt('Enter new title:', photo.title);
             if (newTitle === null) return;
             
-            const newDescription = prompt('Enter new description:', photo.description);
+            const newSteel = prompt('Steel type (leave blank to keep current):', photo.steel || '');
+            if (newSteel === null) return;
+            
+            const newHandle = prompt('Handle material (leave blank to keep current):', photo.handle || '');
+            if (newHandle === null) return;
+            
+            const currentLength = (photo.lengthValue || photo.lengthValue === 0) ? `${photo.lengthValue}` : '';
+            const newLengthValue = prompt('Length value (number, leave blank to keep current):', currentLength);
+            if (newLengthValue === null) return;
+            
+            const newLengthUnit = prompt('Length unit (e.g., in or cm, leave blank to keep current):', photo.lengthUnit || '');
+            if (newLengthUnit === null) return;
+            
+            const newDescription = prompt('Enter new description (leave blank to keep current):', photo.description || '');
             if (newDescription === null) return;
             
             photo.title = newTitle.trim() || photo.title;
-            photo.description = newDescription.trim() || photo.description;
+            if (newSteel.trim() !== '') photo.steel = newSteel.trim();
+            if (newHandle.trim() !== '') photo.handle = newHandle.trim();
+            if (newLengthValue.trim() !== '') {
+                const num = parseFloat(newLengthValue);
+                if (!isNaN(num)) {
+                    photo.lengthValue = num;
+                }
+            }
+            if (newLengthUnit.trim() !== '') photo.lengthUnit = newLengthUnit.trim();
+            if (newDescription.trim() !== '') photo.description = newDescription.trim();
             
             savePhotos();
             displayPhotos();
@@ -466,17 +565,22 @@
         
         // Export data
         function exportData() {
-            if (photos.length === 0) {
+            if (!photos || photos.length === 0) {
                 alert('No photos to export. Please add some photos first.');
                 return;
             }
             
-            // Transform photos to match website format
+            // Transform photos to match website format including structured attributes
             const websiteData = photos.map(photo => ({
                 id: photo.id,
                 title: photo.title,
                 description: photo.description,
-                image: photo.image
+                image: photo.image,
+                // New structured fields:
+                steel: photo.steel || '',
+                handle: photo.handle || '',
+                lengthValue: (photo.lengthValue !== undefined && photo.lengthValue !== null) ? photo.lengthValue : '',
+                lengthUnit: photo.lengthUnit || ''
             }));
             
             const data = `// Gallery data for Gentle Bear Knifeworks
@@ -484,42 +588,23 @@
 
 const galleryData = ${JSON.stringify(websiteData, null, 2)};
 
+// Notes:
+// - This export now includes structured fields: steel, handle, lengthValue, lengthUnit
+// - Example usage in your main.js gallery rendering:
+//   item.steel -> a string describing steel type
+//   item.handle -> handle material
+//   if (item.lengthValue) show item.lengthValue + ' ' + item.lengthUnit
+//
 // Instructions:
 // 1. Copy everything above this line
 // 2. Open main.js file
 // 3. Find the galleryData array (around line 15-70)
 // 4. Replace the entire array with what you copied
-// 5. Save the file and your website will show the new photos
+// 5. Save the file and your website will show the new photos with structured attributes
 
 // After updating, your website will automatically:
-// - Show all your knives in the gallery
-// - Include lightbox functionality
-// - Apply stunning animations to each knife
-// - Update the photo count in real-time`;
+// - Show titles, images and descriptions
+// - Expose steel, handle and length attributes for each knife
+// - Allow you to render these attributes in the gallery cards or details page`;
             
             // Create and download file
-            const blob = new Blob([data], { type: 'text/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'gallery-data.js';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert(`Data exported successfully! You exported ${photos.length} photos. Follow the instructions in the downloaded file to update your website.`);
-        }
-        
-        // Show instructions
-        function showInstructions() {
-            document.getElementById('instructions-modal').classList.remove('hidden');
-        }
-        
-        // Close instructions
-        function closeInstructions() {
-            document.getElementById('instructions-modal').classList.add('hidden');
-        }
-    </script>
-</body>
-</html>
