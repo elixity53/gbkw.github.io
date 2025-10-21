@@ -1,610 +1,333 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Manager - Gentle Bear Knifeworks</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style>
-        :root {
-            --charcoal-black: #1B1B1B;
-            --burnt-orange: #D96B2B;
-            --gunmetal-gray: #2E2E2E;
-            --warm-white: #F5F3EF;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--charcoal-black);
-            color: var(--warm-white);
-        }
-        
-        .upload-area {
-            border: 2px dashed var(--burnt-orange);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .upload-area:hover {
-            background-color: rgba(217, 107, 43, 0.1);
-        }
-        
-        .upload-area.dragover {
-            background-color: rgba(217, 107, 43, 0.2);
-            border-color: #fff;
-        }
-        
-        .photo-item {
-            background-color: var(--gunmetal-gray);
-            border-radius: 12px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .photo-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(217, 107, 43, 0.2);
-        }
-        
-        .photo-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--burnt-orange), #B85450);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(217, 107, 43, 0.3);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--gunmetal-gray);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            color: var(--warm-white);
-            transition: all 0.3s ease;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--burnt-orange);
-            box-shadow: 0 0 0 3px rgba(217, 107, 43, 0.1);
-        }
-        
-        .attr-badge {
-            display: inline-block;
-            background-color: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.04);
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            color: var(--warm-white);
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • GBKW</title>
+  <style>
+    :root { --fg:#111; --muted:#666; --line:#eee; --black:#111;}
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:24px; color:var(--fg); background:#fff;}
+    .card { border:1px solid var(--line); border-radius:12px; padding:16px; margin:12px 0; background:#fff; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+    input, button { padding:8px 10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
+    label { font-weight:600; }
+    .muted { color:var(--muted); font-size:12px; }
+    .pill { display:inline-block; background:#f7f7f7; border:1px solid var(--line); padding:4px 8px; border-radius:999px; margin:4px 6px 0 0;}
+    .danger { background:#ffeaea; border-color:#ffbdbd; color:#b10000;}
+    .primary { background:var(--black); color:#fff; border-color:var(--black); }
+    .secondary { background:#f7f7f7; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+    .hr { height:1px; background:var(--line); margin:16px 0; }
+    .right { display:flex; justify-content:flex-end; gap:10px; }
+    .hidden { display:none; }
+    img.preview { max-width:100%; border-radius:8px; margin-top:6px; display:block; }
+    .uid { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#333; }
+  </style>
+
+  <script type="module">
+    // ---------- Firebase CONFIG (as provided) ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwabcTi-vGohLNC3n3FeflbtEs5pZ8y3s",
+      authDomain: "gbkw-site.firebaseapp.com",
+      projectId: "gbkw-site",
+      storageBucket: "gbkw-site.firebasestorage.app",
+      messagingSenderId: "497739601087",
+      appId: "1:497739601087:web:838db175b2ec970ccca20a"
+    };
+    // --------------------------------------------------
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import {
+      getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, deleteDoc,
+      onSnapshot, serverTimestamp, query, orderBy
+    } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM
+    const authView = document.getElementById('authView');
+    const appView  = document.getElementById('appView');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPass  = document.getElementById('loginPass');
+    const loginBtn   = document.getElementById('loginBtn');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const whoAmI     = document.getElementById('whoAmI');
+
+    const fieldInput = document.getElementById('newField');
+    const addFieldBtn = document.getElementById('addFieldBtn');
+    const fieldsList = document.getElementById('fieldsList');
+
+    const newItemForm = document.getElementById('newItemForm');
+    const dynamicFields = document.getElementById('dynamicFields');
+    const itemsList = document.getElementById('itemsList');
+
+    let schemaFields = [];
+
+    // Auth state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        whoAmI.innerHTML = `Signed in: <span class="uid">${user.email}</span> • UID: <span class="uid">${user.uid}</span>`;
+        initRealtime();
+      } else {
+        appView.classList.add('hidden');
+        authView.classList.remove('hidden');
+        whoAmI.textContent = "";
+      }
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      try {
+        await signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPass.value);
+      } catch (e) {
+        alert("Login failed: " + e.message);
+      }
+    });
+    logoutBtn.addEventListener('click', async () => signOut(auth));
+
+    // Live schema + items
+    function initRealtime() {
+      const cfgRef = doc(db, "config", "gallery");
+      onSnapshot(cfgRef, (snap) => {
+        schemaFields = snap.exists() ? (snap.data().fields || []) : ["steel","handle","length"];
+        renderFields();
+        renderNewItemFields();
+      });
+
+      const q = query(collection(db, "gallery"), orderBy("createdAt", "desc"));
+      onSnapshot(q, (snap) => {
+        itemsList.innerHTML = "";
+        snap.forEach((docSnap) => itemsList.appendChild(renderItemCard(docSnap.id, docSnap.data())));
+      });
+    }
+
+    // Schema controls
+    function renderFields() {
+      fieldsList.innerHTML = "";
+      schemaFields.forEach((f, idx) => {
+        const row = document.createElement('div');
+        row.className = "row";
+        row.innerHTML = `
+          <span class="pill">${f}</span>
+          <button class="secondary" data-idx="${idx}" data-action="rename">Rename</button>
+          <button class="danger" data-idx="${idx}" data-action="delete">Delete</button>
+        `;
+        fieldsList.appendChild(row);
+      });
+
+      fieldsList.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const idx = +e.target.dataset.idx;
+          const action = e.target.dataset.action;
+          const cfgRef = doc(db, "config", "gallery");
+
+          if (action === "delete") {
+            const next = schemaFields.filter((_, i) => i !== idx);
+            await updateDoc(cfgRef, { fields: next });
+          } else if (action === "rename") {
+            const current = schemaFields[idx];
+            const renamed = prompt("New field name:", current);
+            if (renamed && renamed.trim()) {
+              const safe = slugify(renamed);
+              const next = [...schemaFields];
+              next[idx] = safe;
+              await updateDoc(cfgRef, { fields: next });
+            }
+          }
+        });
+      });
+    }
+
+    addFieldBtn.addEventListener('click', async () => {
+      const v = fieldInput.value.trim();
+      if (!v) return;
+      const f = slugify(v);
+      if (schemaFields.includes(f)) return alert("Field already exists.");
+      const cfgRef = doc(db, "config", "gallery");
+      const got = await getDoc(cfgRef);
+      if (!got.exists()) {
+        await setDoc(cfgRef, { fields: [f] });
+      } else {
+        await updateDoc(cfgRef, { fields: [...schemaFields, f] });
+      }
+      fieldInput.value = "";
+    });
+
+    function slugify(s) {
+      return s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+    }
+
+    // New item form
+    function renderNewItemFields() {
+      dynamicFields.innerHTML = "";
+      schemaFields.forEach(f => {
+        const el = document.createElement('div');
+        el.innerHTML = `
+          <label>${f}</label><br/>
+          <input name="attr_${f}" placeholder="${f}" />
+        `;
+        dynamicFields.appendChild(el);
+      });
+    }
+
+    newItemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(newItemForm);
+      const title = (data.get("title") || "").toString().trim();
+      const image = (data.get("image") || "").toString().trim();
+      if (!title) return alert("Title is required");
+
+      const attrs = {};
+      schemaFields.forEach(f => attrs[f] = (data.get(`attr_${f}`) || "").toString().trim());
+
+      await addDoc(collection(db, "gallery"), {
+        title,
+        images: image ? [image] : [],
+        attributes: attrs,
+        createdAt: serverTimestamp()
+      });
+      newItemForm.reset();
+      renderNewItemFields();
+      alert("Item created.");
+    });
+
+    // Item editor
+    function renderItemCard(id, item) {
+      const card = document.createElement('div');
+      card.className = "card";
+      const img = (item.images && item.images[0]) || "";
+      const attrs = item.attributes || {};
+      card.innerHTML = `
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <h3 style="margin:0">${escapeHtml(item.title || "(untitled)")} <span class="muted">• ${id}</span></h3>
+          <div class="right">
+            <button class="danger" data-id="${id}" data-action="delete">Delete</button>
+          </div>
+        </div>
+        <div class="grid" style="margin-top:8px">
+          <div>
+            <label>Title</label><br/>
+            <input data-id="${id}" data-key="title" value="${escapeHtml(item.title||"")}" />
+          </div>
+          <div>
+            <label>Image URL</label><br/>
+            <input data-id="${id}" data-key="image" value="${escapeHtml(img)}" />
+            ${img ? `<div class="muted">Preview:</div><img class="preview" src="${img}" alt="">` : ""}
+          </div>
+          ${schemaFields.map(f => `
+            <div>
+              <label>${f}</label><br/>
+              <input data-id="${id}" data-attr="${f}" value="${escapeHtml(attrs[f]||"")}" />
+            </div>
+          `).join("")}
+        </div>
+        <div class="hr"></div>
+        <div class="right">
+          <button class="primary" data-id="${id}" data-action="save">Save</button>
+        </div>
+      `;
+
+      // bind
+      card.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          const action = e.target.dataset.action;
+          const ref = doc(db, "gallery", id);
+          if (action === "delete") {
+            if (confirm("Delete this item?")) await deleteDoc(ref);
+            return;
+          }
+          if (action === "save") {
+            const scope = card;
+            const title = scope.querySelector('[data-key="title"]').value.trim();
+            const image = scope.querySelector('[data-key="image"]').value.trim();
+            const nextAttrs = {};
+            schemaFields.forEach(f => {
+              const el = scope.querySelector(`[data-attr="${f}"]`);
+              nextAttrs[f] = el ? el.value.trim() : "";
+            });
+            await updateDoc(ref, {
+              title,
+              images: image ? [image] : [],
+              attributes: nextAttrs
+            });
+            alert("Saved.");
+          }
+        });
+      });
+      return card;
+    }
+
+    function escapeHtml(s) {
+      return (s || "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+  </script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="bg-gray-900 py-6">
-        <div class="container mx-auto px-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold text-white">Photo Manager</h1>
-                    <p class="text-gray-400">Manage your knife gallery photos</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="index.html" class="text-orange-400 hover:text-orange-300 transition-colors">
-                        View Website
-                    </a>
-                    <button onclick="exportData()" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">
-                        Export Data
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
-        <!-- Upload Section -->
-        <section class="mb-12">
-            <div class="bg-gray-800 rounded-lg p-8">
-                <h2 class="text-2xl font-bold text-white mb-6">Add New Photo</h2>
-                
-                <!-- Upload Area -->
-                <div class="upload-area mb-6" onclick="document.getElementById('file-input').click()">
-                    <div class="text-6xl mb-4">📸</div>
-                    <h3 class="text-xl font-semibold text-white mb-2">Click to upload or drag and drop</h3>
-                    <p class="text-gray-400">PNG, JPG up to 5MB</p>
-                    <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                </div>
-                
-                <!-- Photo Details Form -->
-                <div id="photo-form" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-white font-semibold mb-2">Title</label>
-                            <input type="text" id="photo-title" class="form-input" placeholder="Knife name or title">
-                        </div>
-                        <div>
-                            <label class="block text-white font-semibold mb-2">Category</label>
-                            <select id="photo-category" class="form-input">
-                                <option value="hunting">Hunting Knife</option>
-                                <option value="chef">Chef Knife</option>
-                                <option value="survival">Survival Knife</option>
-                                <option value="tactical">Tactical Knife</option>
-                                <option value="custom">Custom Design</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div>
-                            <label class="block text-white font-semibold mb-2">Steel Type</label>
-                            <input type="text" id="photo-steel" class="form-input" placeholder="e.g., 1095 High Carbon">
-                        </div>
-                        <div>
-                            <label class="block text-white font-semibold mb-2">Handle Material</label>
-                            <input type="text" id="photo-handle" class="form-input" placeholder="e.g., Desert Ironwood">
-                        </div>
-                        <div>
-                            <label class="block text-white font-semibold mb-2">Length</label>
-                            <div class="flex space-x-2">
-                                <input type="number" id="photo-length-value" class="form-input" placeholder="e.g., 8.5" min="0" step="0.1">
-                                <select id="photo-length-unit" class="form-input" style="width:120px;">
-                                    <option value="in">in</option>
-                                    <option value="cm">cm</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-white font-semibold mb-2">Description</label>
-                        <textarea id="photo-description" class="form-input" rows="3" placeholder="Optional notes or extra details..."></textarea>
-                    </div>
-                    
-                    <div class="flex space-x-4">
-                        <button onclick="addPhoto()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
-                            Add to Gallery
-                        </button>
-                        <button onclick="cancelAdd()" class="px-6 py-3 rounded-lg border-2 border-gray-600 text-gray-400 font-semibold hover:bg-gray-700 transition-colors">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Current Photos -->
-        <section>
-            <div class="bg-gray-800 rounded-lg p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-white">Current Gallery</h2>
-                    <div class="text-gray-400">
-                        <span id="photo-count">0</span> photos
-                    </div>
-                </div>
-                
-                <!-- Photos Grid -->
-                <div id="photos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Photos will be populated here -->
-                </div>
-                
-                <!-- Empty State -->
-                <div id="empty-state" class="text-center py-12">
-                    <div class="text-6xl mb-4">📷</div>
-                    <h3 class="text-xl font-semibold text-white mb-2">No photos yet</h3>
-                    <p class="text-gray-400">Add your first knife photo to get started</p>
-                </div>
-            </div>
-        </section>
-    </main>
-    
-    <!-- Instructions Modal -->
-    <div id="instructions-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl mx-4">
-            <h3 class="text-2xl font-bold text-white mb-4">How to Use Photo Manager</h3>
-            
-            <div class="space-y-4 text-gray-300">
-                <div>
-                    <h4 class="font-semibold text-white mb-2">1. Add Photos</h4>
-                    <p>Click the upload area or drag and drop images to add new photos to your gallery.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold text-white mb-2">2. Add Details</h4>
-                    <p>Fill in the title, category, steel type, handle material, length and a short description for each photo.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold text-white mb-2">3. Manage Photos</h4>
-                    <p>Edit details or remove photos using the buttons on each photo card.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold text-white mb-2">4. Export Data</h4>
-                    <p>Use the Export Data button to get the code needed for your website. The export now includes steel, handle, and length fields.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold text-white mb-2">5. Update Website</h4>
-                    <p>Copy the exported data and replace the galleryData array in your main.js file.</p>
-                </div>
-            </div>
-            
-            <div class="mt-6 flex justify-end">
-                <button onclick="closeInstructions()" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
-                    Got it!
-                </button>
-            </div>
-        </div>
+  <h1>Admin Panel</h1>
+
+  <!-- LOGIN -->
+  <div id="authView" class="card">
+    <h2>Sign in</h2>
+    <div class="row">
+      <input id="loginEmail" type="email" placeholder="you@example.com" />
+      <input id="loginPass" type="password" placeholder="Password" />
+      <button id="loginBtn" class="primary">Login</button>
     </div>
-    
-    <!-- Footer -->
-    <footer class="bg-gray-900 py-6 mt-12">
-        <div class="container mx-auto px-6 text-center">
-            <p class="text-gray-400">
-                Photo Manager for Gentle Bear Knifeworks | 
-                <button onclick="showInstructions()" class="text-orange-400 hover:text-orange-300 transition-colors">
-                    How to Use
-                </button>
-            </p>
+    <p class="muted">Use the admin account(s) you created in Firebase Authentication.</p>
+  </div>
+
+  <!-- APP -->
+  <div id="appView" class="hidden">
+    <div class="row" style="justify-content:space-between; align-items:baseline">
+      <h2 style="margin:0">Gallery Manager</h2>
+      <div class="row" style="gap:8px">
+        <span id="whoAmI" class="muted"></span>
+        <button id="logoutBtn">Log out</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Spec Fields (Schema)</h3>
+      <div class="row">
+        <input id="newField" placeholder="e.g., steel" />
+        <button id="addFieldBtn" class="secondary">Add Field</button>
+      </div>
+      <div id="fieldsList" style="margin-top:10px;"></div>
+      <p class="muted">These fields appear in the item editor and on the public gallery.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Create New Item</h3>
+      <form id="newItemForm">
+        <div class="grid">
+          <div>
+            <label>Title</label><br/>
+            <input name="title" placeholder="Item title" />
+          </div>
+          <div>
+            <label>Image URL</label><br/>
+            <input name="image" placeholder="https://..." />
+          </div>
+          <div id="dynamicFields"></div>
         </div>
-    </footer>
-    
-    <script>
-        // Photo management system with structured attributes: steel, handle, length
-        let photos = JSON.parse(localStorage.getItem('knifePhotos') || '[]');
-        let currentFile = null;
-        
-        // Initialize with default photos if none exist
-        if (photos.length === 0) {
-            photos = [
-                {
-                    id: 1,
-                    title: "The Ember Hunter",
-                    category: "hunting",
-                    description: "Classic drop point hunting knife.",
-                    steel: "1095 High Carbon",
-                    handle: "Desert Ironwood",
-                    lengthValue: 8.5,
-                    lengthUnit: "in",
-                    image: "https://kimi-web-img.moonshot.cn/img/aaknives.eu/fbbd1d79fa131aa2c1b81d5bfb7ed18a13531e19.jpg",
-                    dateAdded: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    title: "Damascus Chef's Pride",
-                    category: "chef",
-                    description: "Beautifully patterned damascus chef's knife.",
-                    steel: "Damascus (multi-layer)",
-                    handle: "Micarta Composite",
-                    lengthValue: 10,
-                    lengthUnit: "in",
-                    image: "https://kimi-web-img.moonshot.cn/img/cdn.shopify.com/0b04f3e57473cc8f0b41177b0a8ee348a9d27f8c.jpg",
-                    dateAdded: new Date().toISOString()
-                },
-                {
-                    id: 3,
-                    title: "The Gentle Bear",
-                    category: "custom",
-                    description: "Signature custom design by Gentle Bear.",
-                    steel: "1084 Carbon Steel",
-                    handle: "Black Walnut",
-                    lengthValue: 9,
-                    lengthUnit: "in",
-                    image: "https://kimi-web-img.moonshot.cn/img/cdn.shopify.com/d1320db6dc02e4f545adb9eec3b1525ed13dffb3.webp",
-                    dateAdded: new Date().toISOString()
-                }
-            ];
-            savePhotos();
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            displayPhotos();
-            updatePhotoCount();
-            setupDragAndDrop();
-        });
-        
-        // Setup drag and drop
-        function setupDragAndDrop() {
-            const uploadArea = document.querySelector('.upload-area');
-            
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFile(files[0]);
-                }
-            });
-        }
-        
-        // Handle file selection
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) {
-                handleFile(file);
-            }
-        }
-        
-        // Handle file
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Please select an image file.');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB.');
-                return;
-            }
-            
-            currentFile = file;
-            
-            // Show form
-            document.getElementById('photo-form').classList.remove('hidden');
-            
-            // Preview image (not shown in UI for now, but FileReader used for validation)
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // preview could be placed here
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        // Add photo
-        function addPhoto() {
-            if (!currentFile) {
-                alert('Please select an image before adding.');
-                return;
-            }
-            
-            const title = document.getElementById('photo-title').value.trim();
-            const category = document.getElementById('photo-category').value;
-            const description = document.getElementById('photo-description').value.trim();
-            const steel = document.getElementById('photo-steel').value.trim();
-            const handle = document.getElementById('photo-handle').value.trim();
-            const lengthValueRaw = document.getElementById('photo-length-value').value;
-            const lengthValue = lengthValueRaw ? parseFloat(lengthValueRaw) : null;
-            const lengthUnit = document.getElementById('photo-length-unit').value;
-            
-            if (!title) {
-                alert('Please enter a title for the photo.');
-                return;
-            }
-            
-            // Convert file to base64
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const photo = {
-                    id: Date.now(),
-                    title: title,
-                    category: category,
-                    description: description,
-                    steel: steel || '',
-                    handle: handle || '',
-                    lengthValue: lengthValue !== null ? lengthValue : '',
-                    lengthUnit: lengthValue !== null ? lengthUnit : '',
-                    image: e.target.result,
-                    dateAdded: new Date().toISOString()
-                };
-                
-                photos.push(photo);
-                savePhotos();
-                displayPhotos();
-                updatePhotoCount();
-                cancelAdd();
-            };
-            reader.readAsDataURL(currentFile);
-        }
-        
-        // Cancel add
-        function cancelAdd() {
-            document.getElementById('photo-form').classList.add('hidden');
-            document.getElementById('photo-title').value = '';
-            document.getElementById('photo-description').value = '';
-            document.getElementById('photo-steel').value = '';
-            document.getElementById('photo-handle').value = '';
-            document.getElementById('photo-length-value').value = '';
-            document.getElementById('photo-length-unit').value = 'in';
-            currentFile = null;
-            // clear file input so same file can be reselected
-            const fileInput = document.getElementById('file-input');
-            if (fileInput) fileInput.value = '';
-        }
-        
-        // Display photos
-        function displayPhotos() {
-            const grid = document.getElementById('photos-grid');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (!photos || photos.length === 0) {
-                grid.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            grid.innerHTML = photos.map(photo => {
-                const steelTxt = photo.steel ? `<span class="attr-badge">Steel: ${escapeHtml(photo.steel)}</span>` : '';
-                const handleTxt = photo.handle ? `<span class="attr-badge">Handle: ${escapeHtml(photo.handle)}</span>` : '';
-                const lengthTxt = (photo.lengthValue || photo.lengthValue === 0) && photo.lengthUnit ? `<span class="attr-badge">Length: ${escapeHtml(String(photo.lengthValue))} ${escapeHtml(photo.lengthUnit)}</span>` : '';
-                
-                const desc = photo.description ? `<p class="text-sm text-gray-400">${escapeHtml(photo.description)}</p>` : '';
-                
-                return `
-                <div class="photo-item">
-                    <img src="${photo.image}" alt="${escapeHtml(photo.title)}">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-white mb-1">${escapeHtml(photo.title)}</h3>
-                        <p class="text-sm text-orange-400 mb-2">${escapeHtml(photo.category || '')}</p>
-                        ${desc}
-                        <div class="mt-2">
-                            ${steelTxt}
-                            ${handleTxt}
-                            ${lengthTxt}
-                        </div>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="editPhoto(${photo.id})" class="btn-primary flex-1 py-2 px-3 rounded text-sm text-white font-semibold">
-                            Edit
-                        </button>
-                        <button onclick="deletePhoto(${photo.id})" class="btn-danger flex-1 py-2 px-3 rounded text-sm text-white font-semibold">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            `;
-            }).join('');
-        }
-        
-        // Update photo count
-        function updatePhotoCount() {
-            document.getElementById('photo-count').textContent = photos.length;
-        }
-        
-        // Edit photo - prompts for structured fields
-        function editPhoto(id) {
-            const photo = photos.find(p => p.id === id);
-            if (!photo) return;
-            
-            const newTitle = prompt('Enter new title:', photo.title);
-            if (newTitle === null) return;
-            
-            const newSteel = prompt('Steel type (leave blank to keep current):', photo.steel || '');
-            if (newSteel === null) return;
-            
-            const newHandle = prompt('Handle material (leave blank to keep current):', photo.handle || '');
-            if (newHandle === null) return;
-            
-            const currentLength = (photo.lengthValue || photo.lengthValue === 0) ? `${photo.lengthValue}` : '';
-            const newLengthValue = prompt('Length value (number, leave blank to keep current):', currentLength);
-            if (newLengthValue === null) return;
-            
-            const newLengthUnit = prompt('Length unit (e.g., in or cm, leave blank to keep current):', photo.lengthUnit || '');
-            if (newLengthUnit === null) return;
-            
-            const newDescription = prompt('Enter new description (leave blank to keep current):', photo.description || '');
-            if (newDescription === null) return;
-            
-            photo.title = newTitle.trim() || photo.title;
-            if (newSteel.trim() !== '') photo.steel = newSteel.trim();
-            if (newHandle.trim() !== '') photo.handle = newHandle.trim();
-            if (newLengthValue.trim() !== '') {
-                const num = parseFloat(newLengthValue);
-                if (!isNaN(num)) {
-                    photo.lengthValue = num;
-                }
-            }
-            if (newLengthUnit.trim() !== '') photo.lengthUnit = newLengthUnit.trim();
-            if (newDescription.trim() !== '') photo.description = newDescription.trim();
-            
-            savePhotos();
-            displayPhotos();
-        }
-        
-        // Delete photo
-        function deletePhoto(id) {
-            if (confirm('Are you sure you want to delete this photo?')) {
-                photos = photos.filter(p => p.id !== id);
-                savePhotos();
-                displayPhotos();
-                updatePhotoCount();
-            }
-        }
-        
-        // Save photos to localStorage
-        function savePhotos() {
-            localStorage.setItem('knifePhotos', JSON.stringify(photos));
-        }
-        
-        // Export data
-        function exportData() {
-            if (!photos || photos.length === 0) {
-                alert('No photos to export. Please add some photos first.');
-                return;
-            }
-            
-            // Transform photos to match website format including structured attributes
-            const websiteData = photos.map(photo => ({
-                id: photo.id,
-                title: photo.title,
-                description: photo.description,
-                image: photo.image,
-                // New structured fields:
-                steel: photo.steel || '',
-                handle: photo.handle || '',
-                lengthValue: (photo.lengthValue !== undefined && photo.lengthValue !== null) ? photo.lengthValue : '',
-                lengthUnit: photo.lengthUnit || ''
-            }));
-            
-            const data = `// Gallery data for Gentle Bear Knifeworks
-// Copy this entire array and replace the galleryData array in main.js
+        <div class="hr"></div>
+        <div class="right">
+          <button type="submit" class="primary">Create</button>
+        </div>
+      </form>
+    </div>
 
-const galleryData = ${JSON.stringify(websiteData, null, 2)};
+    <div class="card">
+      <h3 style="margin-top:0">Items</h3>
+      <div id="itemsList"></div>
+    </div>
+  </div>
+</body>
+</html>
 
-// Notes:
-// - This export now includes structured fields: steel, handle, lengthValue, lengthUnit
-// - Example usage in your main.js gallery rendering:
-//   item.steel -> a string describing steel type
-//   item.handle -> handle material
-//   if (item.lengthValue) show item.lengthValue + ' ' + item.lengthUnit
-//
-// Instructions:
-// 1. Copy everything above this line
-// 2. Open main.js file
-// 3. Find the galleryData array (around line 15-70)
-// 4. Replace the entire array with what you copied
-// 5. Save the file and your website will show the new photos with structured attributes
-
-// After updating, your website will automatically:
-// - Show titles, images and descriptions
-// - Expose steel, handle and length attributes for each knife
-// - Allow you to render these attributes in the gallery cards or details page`;
-            
-            // Create and download file
